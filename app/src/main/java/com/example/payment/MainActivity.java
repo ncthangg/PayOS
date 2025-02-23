@@ -30,33 +30,47 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void createPayment() {
-        PaymentRequest request = new PaymentRequest("ORDER123", "50000", "Thanh toán đơn hàng");
+        String checkoutUrl= "";
+        String orderCode = "ORDER123";
+        String amount = "50000";
+        String description = "Thanh toán đơn hàng";
+        String cancelURL = PayOSConfig.CANCEL_URL;
+        String returnURL = PayOSConfig.RETURN_URL;
+        String checkSumKey = PayOSConfig.CHECKSUM_KEY;
+        String signature = PayOSHelper.createSignatureData(amount, cancelURL, description, orderCode, returnURL, checkSumKey).toString();
 
-        PayOSService.getInstance().createPayment(request).enqueue(new Callback<PaymentResponse>() {
-            @Override
-            public void onResponse(Call<PaymentResponse> call, Response<PaymentResponse> response) {
-                if (response.isSuccessful() && response.body() != null) {
-                    String checkoutUrl = response.body().getCheckoutUrl();
-                    Log.d("PAYOS", "Checkout URL: " + checkoutUrl);
+        PaymentRequest request = new PaymentRequest(orderCode, amount, description, returnURL, cancelURL, signature);
 
-                    // Mở trình duyệt để thanh toán
-                    Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(checkoutUrl));
-                    browserIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-                    startActivity(browserIntent);
-                } else {
-                    try {
-                        Log.e("PAYOS", "Lỗi response: " + response.errorBody().string());
-                    } catch (Exception e) {
-                        e.printStackTrace();
+        Log.d("PAYOS", "Call API: ");
+
+        Log.d("PAYOS", "PayOSService instance: " + PayOSService.getInstance());
+
+            PayOSService.getInstance().createPayment(request).enqueue(new Callback<PaymentResponse>() {
+                @Override
+                public void onResponse(Call<PaymentResponse> call, Response<PaymentResponse> response) {
+                    if (response.isSuccessful() && response.body() != null) {
+                        String checkoutUrl = response.body().getCheckoutUrl();
+                        Log.d("PAYOS", "Checkout URL: " + checkoutUrl);
+
+                        // Mở trình duyệt để thanh toán
+                        Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(checkoutUrl));
+                        browserIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                        startActivity(browserIntent);
+                    } else {
+                        try {
+                            Log.e("PAYOS", "Lỗi response: " + response.errorBody().string());
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                        }
                     }
                 }
-            }
 
-            @Override
-            public void onFailure(Call<PaymentResponse> call, Throwable t) {
-                Log.e("PAYOS", "Lỗi kết nối", t);
-            }
-        });
+                @Override
+                public void onFailure(Call<PaymentResponse> call, Throwable t) {
+                    Log.e("PAYOS", "Lỗi kết nối", t);
+                }
+            });
+
     }
-
 }
+
