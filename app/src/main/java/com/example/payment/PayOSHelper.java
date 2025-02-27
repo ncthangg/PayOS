@@ -23,8 +23,8 @@ public class PayOSHelper {
         }
     }
 
-    public static String createSignatureData(String amount, String cancelUrl, String description,
-                                             String orderCode, String returnUrl, String secretKey) {
+    public static String createSignatureData(int amount, String cancelUrl, String description,
+                                             int orderCode, String returnUrl, String secretKey) {
         String rawData = "amount=" + amount + "&cancelUrl=" + cancelUrl + "&description=" + description
                 + "&orderCode=" + orderCode + "&returnUrl=" + returnUrl;
 

@@ -37,8 +37,8 @@ public class MainActivity extends AppCompatActivity {
     }
 
     protected void createPayment() {
-        String orderCode = "ORDER123";
-        String amount = "50000";
+        int orderCode = 1;
+        int amount = 50000;
         String description = "Thanhtoandonhang";
         String cancelURL = PayOSConfig.CANCEL_URL;
         String returnURL = PayOSConfig.RETURN_URL;
